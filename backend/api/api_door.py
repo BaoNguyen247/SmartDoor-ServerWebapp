@@ -2,11 +2,24 @@ from fastapi import APIRouter, HTTPException
 from ..function.mqtt_function_backend import MQTTFunctionBackend
 
 router = APIRouter()
-mqttbackend = MQTTFunctionBackend()
+_mqttbackend = None
+
+def get_mqtt_backend():
+    """Get or create MQTT backend instance."""
+    global _mqttbackend
+    if _mqttbackend is None:
+        try:
+            _mqttbackend = MQTTFunctionBackend()
+            print("[api_door] MQTT backend initialized")
+        except Exception as e:
+            print(f"[api_door] Failed to initialize MQTT backend: {e}")
+            raise
+    return _mqttbackend
 # Endpoint to open the door
 @router.post("/open-door")
 async def open_door():
     try:
+        mqttbackend = get_mqtt_backend()
         result = mqttbackend.send_unlock_command()
         if result:
             print(f"[/open-door] Door unlock command sent successfully")
@@ -21,7 +34,8 @@ async def open_door():
 @router.post("/change-password")
 async def change_password(new_password: str):
     try:
-        result = mqttbackend.change_passowrd(new_password)
+        mqttbackend = get_mqtt_backend()
+        result = mqttbackend.change_password(new_password)
         if result:
             print(f"[/change-password] Password change command sent successfully")
             return {"message": "Password change command sent", "status": "success"}

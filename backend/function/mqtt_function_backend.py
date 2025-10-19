@@ -13,7 +13,7 @@ class MQTTFunctionBackend:
         try:
             self.client.connect(self.MQTT_BROKER, self.MQTT_PORT, 60)
             self.client.publish(self.MQTT_TOPIC_CONTROL, "unlock")
-            client.disconnect()
+            self.client.disconnect()
             return True
         except Exception as e:
             print(f"[send_unlock_command] Error: {e}")
@@ -24,7 +24,7 @@ class MQTTFunctionBackend:
         try:
             self.client.connect(self.MQTT_BROKER, self.MQTT_PORT, 60)
             self.client.publish(self.MQTT_TOPIC_CHANGE_PASSWORD, new_password)
-            client.disconnect()
+            self.client.disconnect()
             return True
         except Exception as e:
             print(f"[change_password] Error: {e}")
