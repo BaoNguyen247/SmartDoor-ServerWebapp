@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Nhận Diện Khuôn Mặt</title>
+    <meta name="description" content="Webapp hiện đại cho hệ thống nhận diện khuôn mặt với công nghệ AI tiên tiến">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-10">
+        <div class="p-6 border-b border-gray-200">
+            <h1 class="text-xl font-bold text-gray-800">Nhận Diện Khuôn Mặt</h1>
+        </div>
+        
+        <nav class="mt-6">
+            <div class="sidebar-item active px-6 py-4 cursor-pointer flex items-center space-x-3" onclick="showSection('face-recognition')">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-gray-700 font-medium">Nhận diện khuôn mặt</span>
+            </div>
+            
+            <div class="sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3" onclick="showSection('face-registration')">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+                <span class="text-gray-700 font-medium">Đăng ký khuôn mặt</span>
+            </div>
+            
+            <div class="sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3" onclick="showSection('door-control')">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-gray-700 font-medium">Điều Khiển Cửa</span>
+            </div>
+            
+            <div class="sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3" onclick="showSection('history')">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700 font-medium">Lịch Sử</span>
+            </div>
+            
+            <div class="sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 mt-8 text-red-600 hover:bg-red-50" onclick="logout()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span class="font-medium">Đăng Xuất</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 min-h-screen">
+        <div class="tab-content">
+            <section id="face-recognition" class="p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Nhận Diện Khuôn Mặt</h2>
+                
+                <img id="processed-video-feed" src="" alt="Processed Video Stream" width="640" height="480">
+                
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="text-center">
+                        <div class="bg-gray-100 rounded-lg p-4 inline-block">
+                            <p class="text-lg font-semibold text-gray-700">
+                                ID: <span id="person-id" class="text-blue-600">Unknown</span>
+                            </p>
+                            <p class="text-lg font-semibold text-gray-700">
+                                Độ chính xác: <span id="accuracy" class="text-green-600">0%</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="face-registration" class="p-8 hidden">
+                <div class="particles-container" id="particles-js"></div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 relative z-10">Đăng Ký Khuôn Mặt</h2>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Form -->
+                        <div>
+                            <form id="registration-form" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Họ và Tên</label>
+                                    <input type="text" id="fullname" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập họ và tên">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Giới Tính</label>
+                                    <select id="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Chọn giới tính</option>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Số Điện Thoại</label>
+                                    <input type="tel" id="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập số điện thoại">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phòng Ban</label>
+                                    <input type="text" id="department" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập phòng ban">
+                                </div>
+                                
+                                <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                                    Bắt Đầu Đăng Ký
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Camera and Progress -->
+                        <div class="text-center">
+                            <div class="camera-frame w-full max-w-md mx-auto mb-6">
+                                <video id="registration-video" class="w-full h-64 object-cover" autoplay muted></video>
+                                <!-- Processed MJPEG stream for registration (appears in the small rectangle) -->
+                                <img id="processed-video-feed-registration" class="processed-overlay" src="" alt="Processed Video Stream (registration)">
+                            </div>
+                            
+                            <!-- Progress Circle -->
+                            <div class="relative inline-block">
+                                <svg class="progress-circle w-32 h-32" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                                    <circle id="progress-circle" cx="60" cy="60" r="50" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="314"/>
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#007BFF"/>
+                                            <stop offset="100%" style="stop-color:#00FF7F"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="progress-text" class="text-2xl font-bold text-gray-700">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="door-control" class="p-8 hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Điều Khiển Cửa</h2>
+                
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-4">Chế Độ Tự Động</h3>
+                            <div class="toggle-switch mx-auto" id="auto-toggle" onclick="toggleSwitch('auto')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Tự động mở cửa khi nhận diện thành công</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-4">Mở Cửa Thủ Công</h3>
+                            <div class="toggle-switch mx-auto" id="manual-toggle" onclick="toggleSwitch('manual')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Mở cửa bằng tay</p>
+                            
+                            <!-- Manual Open Button -->
+                            <div class="mt-6">
+                                <button id="open-door-btn" class="open-door-btn bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                                    Mở Cửa
+                                </button>
+                                <div id="open-door-status" class="mt-3 text-sm text-gray-600"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history" class="p-8 hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Lịch Sử Truy Cập</h2>
+                
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ảnh</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phòng Ban</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">NV001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Nguyễn Văn A</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">IT</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-01-15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">08:30:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Thành công</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="faceRecognition.js"></script>
+    <script src="faceRegistration.js"></script>
+    <script src="doorControl.js"></script>
+    <script src="accessHistory.js"></script>
+    <script src="logout.js"></script>
+    <script>
+        // Keep small utility functions here; rely on app.js for showSection implementation
+        function logout() {
+            alert('Đăng xuất thành công!');
+            // Thêm logic đăng xuất thực tế nếu cần
+        }
+
+        function toggleSwitch(mode) {
+            const toggle = document.getElementById(mode + '-toggle');
+            toggle.classList.toggle('active');
+            // Thêm logic điều khiển cửa nếu cần
+        }
+        
+        // Let app.js handle default section show on DOMContentLoaded
+    </script>
+</body>
+</html>
